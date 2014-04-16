@@ -18,7 +18,18 @@ describe "Static pages" do
     it_should_behave_like "all static pages"
     it { should_not have_title('| Home') }
 
-    describe "for signed-in users" do
+    describe "for signed-in users with 1 micropost" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        sign_in user
+        visit root_path
+      end
+      it { should have_content("1 micropost") }
+      it { should_not have_content("1 microposts") }
+    end
+
+    describe "for signed-in users with 2 microposts" do
       let(:user) { FactoryGirl.create(:user) }
       before do
         FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
@@ -26,6 +37,18 @@ describe "Static pages" do
         sign_in user
         visit root_path
       end
+      it { should have_content("2 microposts") }
+    end
+
+
+    describe "for signed-in users" do
+      let(:user) { FactoryGirl.create(:user) }
+      before do
+        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+        sign_in user
+        visit root_path
+      end          
 
       it "should render the user's feed" do
         user.feed.each do |item|
