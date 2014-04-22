@@ -212,4 +212,17 @@ describe "email address with mixed case" do
       its(:followed_users) { should_not include(other_user) }
     end
   end
+
+  describe "deleted user should have all relationships removed" do
+    let(:other_user) { FactoryGirl.create(:user) }
+    before do
+      @user.save
+      @user.follow!(other_user)
+      other_user.follow!(@user)
+      @user.destroy
+    end
+    subject { other_user }
+    its(:followers) { should be_empty }
+    its(:followed_users) { should be_empty }
+  end
 end
